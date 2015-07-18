@@ -1,0 +1,4 @@
+#!/bin/bash
+APTLY_MOUNT=/mnt/aptly
+GPG_PASSPHRASE="${GPG_PASSPHRASE:-unset}"
+docker run -it --rm -v ${APTLY_MOUNT}:/mnt -e GPG_PASSPHRASE="${GPG_PASSPHRASE}" faye/aptly "/usr/local/bin/aptly" "$@"

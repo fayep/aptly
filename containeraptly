@@ -1,0 +1,28 @@
+#!/bin/bash
+if [ ! -d /mnt/db ]; then
+	echo "# No aptly db dir was found, assuming first run." >&2
+	echo "# If not first run, ensure you use the correct mountpoint" >&2
+	echo "#" >&2
+	echo "# To install the local part, run this as root:" >&2
+	echo "# docker run --rm -v /mnt/aptly:/mnt faye/aptly | /bin/bash" >&2
+	echo "# edit /usr/local/bin/aptly and above if you want to use a" >&2
+	echo "# different path for aptly" >&2
+	echo "docker cp $(hostname):/usr/share/bin/aptly /usr/local/bin/"
+	echo "chmod 0755 /usr/local/bin/aptly"
+	echo "#Sleeping 2 secs to ensure we're still around during the copy" >&2
+	sleep 2
+	# This will be a noop if there's no mount
+	mkdir -p /mnt/db
+	exit 1
+fi
+if [ "$1" == "publish" ]; then
+	if [ "${GPG_PASSPHRASE}" == "unset" ]; then
+		echo "You must supply a GPG_PASSPHRASE to publish"
+		exit 1
+	fi
+	BEFORE="$1 $2"
+	shift; shift
+	script -qfc "/usr/bin/aptly ${BEFORE} -passphrase '${GPG_PASSPHRASE}' $@"
+else
+	/usr/bin/aptly $@
+fi
