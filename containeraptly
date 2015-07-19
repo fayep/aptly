@@ -15,14 +15,14 @@ if [ ! -d /mnt/db ]; then
 	mkdir -p /mnt/db
 	exit 1
 fi
-if [ "$1" == "publish" ]; then
+if [ "$1" == "publish" -a "$2" != "help" -a "$2" != "list" -a "$2" != "drop" ]; then
 	if [ "${GPG_PASSPHRASE}" == "unset" ]; then
 		echo "You must supply a GPG_PASSPHRASE to publish"
 		exit 1
 	fi
 	BEFORE="$1 $2"
 	shift; shift
-	script -qfc "/usr/bin/aptly ${BEFORE} -passphrase '${GPG_PASSPHRASE}' $@"
+	/usr/bin/aptly ${BEFORE} "-passphrase=${GPG_PASSPHRASE}" "$@"
 else
-	/usr/bin/aptly $@
+	/usr/bin/aptly "$@"
 fi
